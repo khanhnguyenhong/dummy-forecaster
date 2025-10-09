@@ -1,0 +1,142 @@
+    <div class="book-of-changes-container">
+      <h1>Book of Changes (易經)</h1>
+      <p class="subtitle">Enter three numbers to generate your Yi Jing hexagram</p>
+
+      <mat-card class="input-card">
+        <mat-card-header>
+          <mat-card-title>Input Numbers</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="input-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>Heaven (天)</mat-label>
+              <input matInput type="number" [(ngModel)]="heaven" min="1" placeholder="Enter any positive number">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Earth (地)</mat-label>
+              <input matInput type="number" [(ngModel)]="earth" min="1" placeholder="Enter any positive number">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Changes (人)</mat-label>
+              <input matInput type="number" [(ngModel)]="change" min="1" placeholder="Enter any positive number">
+            </mat-form-field>
+          </div>
+
+          <button mat-raised-button color="primary" (click)="generateHexagram()"
+                  [disabled]="!isValidInput()" class="generate-btn">
+            <mat-icon>calculate</mat-icon>
+            Generate Hexagram
+          </button>
+        </mat-card-content>
+      </mat-card>
+
+      @if (currentHexagram && resultHexagram) {
+        <!-- Situation Hexagram -->
+        <mat-card class="result-card">
+          <mat-card-header>
+            <mat-card-title>Situation Hexagram {{currentHexagram.number}}: {{currentHexagram.name}}</mat-card-title>
+            <mat-card-subtitle>Current situation described by Heaven and Earth trigrams</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="hexagram-display">
+              <div class="trigram-info">
+                <div class="trigram-label">Upper Trigram (Heaven): {{getHeavenTrigram().name}}</div>
+                <div class="trigram-label">Lower Trigram (Earth): {{getEarthTrigram().name}}</div>
+              </div>
+              <div class="hexagram-lines">
+                @for (line of currentHexagram.lines; track $index) {
+                  <div class="hexagram-line" [class]="line.type">
+                    <span class="line-number">{{$index + 1}}</span>
+                    <div class="line-visual">
+                      @if (line.type === 'yang' || line.type === 'changing-yang') {
+                        <div class="yang-line">
+                          <div class="solid-line"></div>
+                        </div>
+                      } @else {
+                        <div class="yin-line">
+                          <div class="broken-line-left"></div>
+                          <div class="broken-line-right"></div>
+                        </div>
+                      }
+                      @if (change - 1 === $index) {
+                        <mat-icon class="changing-indicator">change_circle</mat-icon>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="interpretation">
+              <h3>Situation Analysis</h3>
+              <p>{{currentHexagram.interpretation}}</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Result Hexagram -->
+        <mat-card class="result-card">
+          <mat-card-header>
+            <mat-card-title>Result Hexagram {{resultHexagram.number}}: {{resultHexagram.name}}</mat-card-title>
+            <mat-card-subtitle>Result after applying changes from the Changes trigram</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="hexagram-display">
+              <div class="trigram-info">
+                <div class="trigram-label">Changes Hexagram: {{resultHexagram.name}}</div>
+                <div class="trigram-label">Changing Line: {{ change }}</div>
+              </div>
+              <div class="hexagram-lines">
+                @for (line of resultHexagram.lines; track $index) {
+                  <div class="hexagram-line" [class]="line.type">
+                    <span class="line-number">{{$index + 1}}</span>
+                    <div class="line-visual">
+                      @if (line.type === 'yang' || line.type === 'changing-yang') {
+                        <div class="yang-line">
+                          <div class="solid-line"></div>
+                        </div>
+                      } @else {
+                        <div class="yin-line">
+                          <div class="broken-line-left"></div>
+                          <div class="broken-line-right"></div>
+                        </div>
+                      }
+                      @if (change - 1 === $index) {
+                        <mat-icon class="changing-indicator">change_circle</mat-icon>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="interpretation">
+              <h3>Result Analysis</h3>
+              <p>{{resultHexagram.interpretation}}</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="result-card">
+          <mat-card-header>
+            <mat-card-title>Prompt</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="input-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Việc cần tính</mat-label>
+                <input matInput type="text" [(ngModel)]="askingIssue" placeholder="Việc cần tính">
+              </mat-form-field>
+            </div>
+
+            <button mat-raised-button color="primary" (click)="generatePrompt()"
+                    class="generate-btn">
+              <mat-icon>calculate</mat-icon>
+              Generate & Copy Prompt
+            </button>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
