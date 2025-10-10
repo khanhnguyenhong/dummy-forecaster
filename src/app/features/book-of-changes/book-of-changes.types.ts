@@ -15,9 +15,3 @@ export interface Hexagram {
   interpretation: string;
   lines: HexagramLine[];
 }
-
-export interface HexagramReading {
-  situationHexagram: Hexagram;
-  resultHexagram: Hexagram;
-  changingLines: number[];
-}
