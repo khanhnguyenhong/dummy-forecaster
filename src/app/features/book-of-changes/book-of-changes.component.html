@@ -104,6 +104,50 @@
       </mat-card-content>
     </mat-card>
 
+    <!-- Support Hexagram -->
+    <mat-card class="result-card">
+      <mat-card-header>
+        <mat-card-title
+        >Support Hexagram {{ supportHexagram?.number }}: {{ supportHexagram?.name }}</mat-card-title
+        >
+        <mat-card-subtitle
+        >Support the change from Current Hexagram to Result Hexagram</mat-card-subtitle
+        >
+      </mat-card-header>
+      <mat-card-content>
+        <div class="hexagram-display">
+          <div class="trigram-info">
+            <div class="trigram-label">Upper Trigram (Heaven): {{ supportHexagram?.trigrams?.upper?.name }}</div>
+            <div class="trigram-label">Lower Trigram (Earth): {{ supportHexagram?.trigrams?.lower?.name }}</div>
+          </div>
+          <div class="hexagram-lines">
+            @for (line of supportHexagram?.lines; track $index) {
+              <div class="hexagram-line" [class]="line.type">
+                <span class="line-number">{{ $index + 1 }}</span>
+                <div class="line-visual">
+                  @if (line.type === 'yang' || line.type === 'changing-yang') {
+                    <div class="yang-line">
+                      <div class="solid-line"></div>
+                    </div>
+                  } @else {
+                    <div class="yin-line">
+                      <div class="broken-line-left"></div>
+                      <div class="broken-line-right"></div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="interpretation">
+          <h3>Support Analysis</h3>
+          <p>{{ supportHexagram?.interpretation }}</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
     <!-- Result Hexagram -->
     <mat-card class="result-card">
       <mat-card-header>
@@ -117,8 +161,9 @@
       <mat-card-content>
         <div class="hexagram-display">
           <div class="trigram-info">
-            <div class="trigram-label">Changes Hexagram: {{ resultHexagram.name }}</div>
             <div class="trigram-label">Changing Line: {{ change + 1 }}</div>
+            <div class="trigram-label">Upper Trigram (Heaven): {{ resultHexagram.trigrams?.upper?.name }}</div>
+            <div class="trigram-label">Lower Trigram (Earth): {{ resultHexagram.trigrams?.lower?.name }}</div>
           </div>
           <div class="hexagram-lines">
             @for (line of resultHexagram.lines; track $index) {

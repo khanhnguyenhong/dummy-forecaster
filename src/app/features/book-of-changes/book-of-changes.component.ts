@@ -30,6 +30,7 @@ export class BookOfChangesComponent {
   changeInput = 1;
   askingIssue = '';
   currentHexagram: Hexagram | null = null;
+  supportHexagram: Hexagram | null = null;
   resultHexagram: Hexagram | null = null;
   change = 1;
 
@@ -59,7 +60,9 @@ export class BookOfChangesComponent {
 
     // Step 4: Find corresponding hexagrams from database
     const situationHexagram = this.findHexagramByLines(situationLines);
+    this.supportHexagram = this.findSupportingHexagram(situationLines);
     const resultHexagram = this.findHexagramByLines(resultLines);
+    resultHexagram.trigrams = Hexagram.getTrigrams(resultHexagram, this.trigrams);
 
     // Step 5: Store results
     this.currentHexagram = situationHexagram;
@@ -85,6 +88,17 @@ export class BookOfChangesComponent {
       resultLines[changeNumber] = { type: 'yin', value: 6 };
     }
     return { resultLines };
+  }
+
+  private findSupportingHexagram(lines = [] as HexagramLine[]): Hexagram {
+    return Hexagram.fromLines([
+      lines[1],
+      lines[2],
+      lines[3],
+      lines[2],
+      lines[3],
+      lines[4],
+    ], this.hexagrams, this.trigrams)
   }
 
   private findHexagramByLines(lines: HexagramLine[]): Hexagram {
@@ -118,7 +132,7 @@ export class BookOfChangesComponent {
   }
 
   generatePrompt(): void {
-    const prompt = `Bạn là một chuyên gia kinh dịch, hãy tính giúp tôi quẻ có Thiên là ${this.heaven}, Địa là ${this.earth}, biến quẻ ${this.change} cho việc ${this.askingIssue}. Để tránh nhầm lẫn, hãy phân tính quẻ và phân tích từng bước để có quẻ hỗ, quẻ biến rồi sau đó phân tích quẻ theo 2 hướng tốt và xấu.`;
+    const prompt = `Bạn là một chuyên gia kinh dịch, hãy tính giúp tôi quẻ có Thiên là ${this.heaven}, Địa là ${this.earth}, biến hào ${this.change + 1}, quẻ chủ "${this.currentHexagram?.name}", quẻ hỗ "${this.supportHexagram?.name}", quẻ biến "${this.resultHexagram?.name}" cho việc "${this.askingIssue}". Để tránh nhầm lẫn, hãy kiểm tra quẻ đã tính được rồi sau đó phân tích quẻ theo 2 hướng tốt và xấu.`;
     // copy prompt to clipboard
     navigator.clipboard
       .writeText(prompt)
