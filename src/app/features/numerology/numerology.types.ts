@@ -22,6 +22,7 @@ export interface BirthChartPosition {
   position: string;
   number: number;
   meaning: string;
+  shortMeaning: string;
   description: string;
 }
 

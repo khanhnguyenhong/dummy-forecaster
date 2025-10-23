@@ -5,9 +5,6 @@
         <mat-icon>calculate</mat-icon>
         Máy tính thần số học (Numerology Calculator)
       </mat-card-title>
-      <mat-card-subtitle>
-        Khám phá số chủ đạo, biểu đồ ngày sinh và thần số học cá nhân
-      </mat-card-subtitle>
     </mat-card-header>
 
     <mat-card-content>
@@ -71,6 +68,8 @@
           <mat-card-header>
             <mat-card-title>Ngày sinh: {{ formatBirthDate() }}</mat-card-title>
           </mat-card-header>
+          <mat-card-content>
+          </mat-card-content>
         </mat-card>
 
         <!-- Life Path Number Section -->
@@ -125,7 +124,7 @@
           <mat-card-header>
             <mat-card-title>Biểu đồ ngày sinh (Birth Chart)</mat-card-title>
             <mat-card-subtitle
-              >Thần số học Việt Nam - Phân tích tần suất xuất hiện của các chữ số</mat-card-subtitle
+              >Phân tích tần suất xuất hiện của các chữ số</mat-card-subtitle
             >
           </mat-card-header>
           <mat-card-content>
@@ -143,7 +142,7 @@
                   >
                     <div class="cell-number">{{ position.number }}</div>
                     <div class="cell-position">{{ position.position }}</div>
-                    <div class="cell-meaning">{{ position.meaning }}</div>
+                    <div class="cell-meaning">{{ position.shortMeaning }}</div>
                   </div>
                 </div>
               </div>
