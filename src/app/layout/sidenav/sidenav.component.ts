@@ -24,6 +24,6 @@ export class SidenavComponent {
   menuItems = [
     { name: 'Home', route: '/', icon: 'home' },
     { name: 'BookOfChanges', route: '/bookOfChanges', icon: 'star' },
-    { name: 'Feature 2', route: '/feature2', icon: 'settings' }
+    { name: 'Numerology Calculator', route: '/numerology', icon: 'calculate' }
   ];
 }

@@ -1,0 +1,256 @@
+<div class="numerology-container">
+  <mat-card class="main-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>calculate</mat-icon>
+        Máy tính thần số học (Numerology Calculator)
+      </mat-card-title>
+      <mat-card-subtitle>
+        Khám phá số chủ đạo, biểu đồ ngày sinh và thần số học cá nhân
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Birth Date Input Form -->
+      <form [formGroup]="numerologyForm" (ngSubmit)="calculateNumerology()" class="birth-date-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Ngày sinh</mat-label>
+          <input
+            matInput
+            [matDatepicker]="picker"
+            formControlName="birthDate"
+            required
+            placeholder="DD/MM/YYYY"
+            [matDatepickerFilter]="dateFilter"
+            [min]="minDate"
+            [max]="maxDate"
+          />
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker
+            #picker
+            [startView]="'multi-year'"
+            [startAt]="startDate"
+          ></mat-datepicker>
+          <mat-error *ngIf="numerologyForm.get('birthDate')?.hasError('required')">
+            Vui lòng chọn ngày sinh
+          </mat-error>
+          <mat-error *ngIf="numerologyForm.get('birthDate')?.hasError('invalidDate')">
+            Ngày không hợp lệ
+          </mat-error>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="numerologyForm.invalid || isCalculating"
+          >
+            <mat-icon *ngIf="isCalculating">hourglass_empty</mat-icon>
+            <mat-icon *ngIf="!isCalculating">calculate</mat-icon>
+            {{ isCalculating ? 'Đang tính toán...' : 'Tính thần số học' }}
+          </button>
+
+          <button mat-button type="button" (click)="clearForm()" [disabled]="isCalculating">
+            <mat-icon>clear</mat-icon>
+            Xóa
+          </button>
+        </div>
+      </form>
+
+      <!-- Loading indicator -->
+      <div *ngIf="isCalculating" class="loading-container">
+        <mat-icon class="spinning">hourglass_empty</mat-icon>
+        <p>Đang tính toán kết quả thần số học của bạn...</p>
+      </div>
+
+      <!-- Results Display -->
+      <div *ngIf="reading && !isCalculating" class="results-container">
+        <!-- Birth Date Summary -->
+        <mat-card class="result-card">
+          <mat-card-header>
+            <mat-card-title>Ngày sinh: {{ formatBirthDate() }}</mat-card-title>
+          </mat-card-header>
+        </mat-card>
+
+        <!-- Life Path Number Section -->
+        <mat-card class="result-card">
+          <mat-card-header>
+            <mat-card-title class="life-path-title">
+              Số chủ đạo (Life Path Number): {{ reading.lifePathNumber.number }}
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p class="life-path-explanation">{{ reading.lifePathNumber.explanation }}</p>
+
+            <mat-expansion-panel class="details-panel">
+              <mat-expansion-panel-header>
+                <mat-panel-title>Đặc điểm & Chi tiết</mat-panel-title>
+              </mat-expansion-panel-header>
+
+              <div class="details-content">
+                <div class="detail-section">
+                  <h4>Đặc điểm cốt lõi</h4>
+                  <mat-chip-listbox>
+                    <mat-chip *ngFor="let characteristic of reading.lifePathNumber.characteristics">
+                      {{ characteristic }}
+                    </mat-chip>
+                  </mat-chip-listbox>
+                </div>
+
+                <div class="detail-section">
+                  <h4>Điểm mạnh</h4>
+                  <mat-chip-listbox>
+                    <mat-chip *ngFor="let strength of reading.lifePathNumber.strengths">
+                      {{ strength }}
+                    </mat-chip>
+                  </mat-chip-listbox>
+                </div>
+
+                <div class="detail-section">
+                  <h4>Thách thức</h4>
+                  <mat-chip-listbox>
+                    <mat-chip *ngFor="let challenge of reading.lifePathNumber.challenges">
+                      {{ challenge }}
+                    </mat-chip>
+                  </mat-chip-listbox>
+                </div>
+              </div>
+            </mat-expansion-panel>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Birth Chart Matrix -->
+        <mat-card class="result-card">
+          <mat-card-header>
+            <mat-card-title>Biểu đồ ngày sinh (Birth Chart)</mat-card-title>
+            <mat-card-subtitle
+              >Thần số học Việt Nam - Phân tích tần suất xuất hiện của các chữ số</mat-card-subtitle
+            >
+          </mat-card-header>
+          <mat-card-content>
+            <div class="chart-matrix">
+              <div class="matrix-grid">
+                <div
+                  *ngFor="let row of reading.birthChart.positions; let rowIndex = index"
+                  class="matrix-row"
+                >
+                  <div
+                    *ngFor="let position of row; let colIndex = index"
+                    class="matrix-cell"
+                    [class.master-number]="position.number === 11 || position.number === 22"
+                    [attr.data-frequency]="position.number"
+                  >
+                    <div class="cell-number">{{ position.number }}</div>
+                    <div class="cell-position">{{ position.position }}</div>
+                    <div class="cell-meaning">{{ position.meaning }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Personal Numbers -->
+        <mat-card class="result-card">
+          <mat-card-header>
+            <mat-card-title>Các số cá nhân hiện tại</mat-card-title>
+            <mat-card-subtitle>Chu kỳ thần số học cá nhân của bạn</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="personal-numbers">
+              <div class="personal-number-item">
+                <div class="number-badge">{{ reading.personalYear }}</div>
+                <div class="number-info">
+                  <h4>Năm cá nhân</h4>
+                  <p>{{ getPersonalYearDescription() }}</p>
+                </div>
+              </div>
+
+              <div class="personal-number-item">
+                <div class="number-badge">{{ reading.personalMonth }}</div>
+                <div class="number-info">
+                  <h4>Tháng cá nhân</h4>
+                  <p>{{ getPersonalMonthDescription() }}</p>
+                </div>
+              </div>
+
+              <div class="personal-number-item">
+                <div class="number-badge">{{ reading.personalDay }}</div>
+                <div class="number-info">
+                  <h4>Ngày cá nhân</h4>
+                  <p>{{ getPersonalDayDescription() }}</p>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Chart Details -->
+        <mat-card class="result-card">
+          <mat-card-header>
+            <mat-card-title>Ý nghĩa các chữ số (Digit Meanings)</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-expansion-panel class="chart-details-panel">
+              <mat-expansion-panel-header>
+                <mat-panel-title>Giải thích chi tiết từng chữ số</mat-panel-title>
+              </mat-expansion-panel-header>
+
+              <div class="position-details">
+                <div *ngFor="let row of reading.birthChart.positions" class="position-row">
+                  <div *ngFor="let position of row" class="position-detail">
+                    <h4>{{ position.position }} ({{ position.number }})</h4>
+                    <p><strong>Ý nghĩa:</strong> {{ position.meaning }}</p>
+                    <p><strong>Mô tả:</strong> {{ position.description }}</p>
+                  </div>
+                </div>
+              </div>
+            </mat-expansion-panel>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Missing Digits Analysis -->
+        <mat-card
+          class="result-card"
+          *ngIf="reading.missingDigits && reading.missingDigits.length > 0"
+        >
+          <mat-card-header>
+            <mat-card-title>Chữ số thiếu (Missing Digits)</mat-card-title>
+            <mat-card-subtitle
+              >Các chữ số không xuất hiện trong ngày sinh của bạn</mat-card-subtitle
+            >
+          </mat-card-header>
+          <mat-card-content>
+            <div class="missing-digits">
+              <mat-chip-listbox>
+                <mat-chip *ngFor="let digit of reading.missingDigits" class="missing-digit-chip">
+                  {{ digit }}: {{ getMissingDigitMeaning(digit) }}
+                </mat-chip>
+              </mat-chip-listbox>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Arrow Patterns Analysis -->
+        <mat-card
+          class="result-card"
+          *ngIf="reading.arrowPatterns && reading.arrowPatterns.length > 0"
+        >
+          <mat-card-header>
+            <mat-card-title>Mũi tên (Arrow Patterns)</mat-card-title>
+            <mat-card-subtitle>Các mẫu hình chữ số đặc biệt trong biểu đồ</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="arrow-patterns">
+              <div *ngFor="let pattern of reading.arrowPatterns" class="arrow-pattern-item">
+                <mat-icon class="arrow-icon">trending_up</mat-icon>
+                <span>{{ pattern }}</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

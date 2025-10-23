@@ -12,9 +12,9 @@ export const routes: Routes = [
     title: 'Book of Changes'
   },
   {
-    path: 'feature2',
-    loadComponent: () => import('./features/feature2/feature2.component').then(m => m.Feature2Component),
-    title: 'Feature 2'
+    path: 'numerology',
+    loadComponent: () => import('./features/numerology/numerology.component').then(m => m.NumerologyComponent),
+    title: 'Numerology Calculator'
   },
   { path: '**', redirectTo: '' } // Redirect to home for any unknown routes
 ];
